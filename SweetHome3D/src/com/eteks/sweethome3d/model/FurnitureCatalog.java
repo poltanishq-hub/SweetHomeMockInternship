@@ -28,7 +28,7 @@ import java.util.List;
  * @author Emmanuel Puybaret
  */
 public class FurnitureCatalog {
-  private List<FurnitureCategory>       categories = new ArrayList<FurnitureCategory>();
+  private List<FurnitureCategory> categories = new ArrayList<FurnitureCategory>();
   private final CollectionChangeSupport<CatalogPieceOfFurniture> furnitureChangeSupport = 
                              new CollectionChangeSupport<CatalogPieceOfFurniture>(this);
 

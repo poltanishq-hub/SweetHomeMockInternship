@@ -51,12 +51,12 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
    * to a piece of furniture will be notified under a property name equal to the string value of one these properties.
    */
   public enum Property {NAME, NAME_VISIBLE, NAME_X_OFFSET, NAME_Y_OFFSET, NAME_STYLE, NAME_ANGLE,
-      DESCRIPTION, PRICE, WIDTH, DEPTH, HEIGHT, COLOR, TEXTURE, MODEL_MATERIALS, SHININESS, VISIBLE, X, Y, ELEVATION, ANGLE, MODEL_MIRRORED, MOVABLE, LEVEL};
+      DESCRIPTION, PRICE, WIDTH, DEPTH, HEIGHT, VOLUME, COLOR, TEXTURE, MODEL_MATERIALS, SHININESS, VISIBLE, X, Y, ELEVATION, ANGLE, MODEL_MIRRORED, MOVABLE, LEVEL};
   
   /** 
    * The properties on which home furniture may be sorted.  
    */
-  public enum SortableProperty {CATALOG_ID, NAME, WIDTH, DEPTH, HEIGHT, MOVABLE, 
+  public enum SortableProperty {CATALOG_ID, NAME, WIDTH, DEPTH, HEIGHT, VOLUME, MOVABLE,
                                 DOOR_OR_WINDOW, COLOR, TEXTURE, VISIBLE, X, Y, ELEVATION, ANGLE,
                                 PRICE, VALUE_ADDED_TAX, VALUE_ADDED_TAX_PERCENTAGE, PRICE_VALUE_ADDED_TAX_INCLUDED, LEVEL};
   private static final Map<SortableProperty, Comparator<HomePieceOfFurniture>> SORTABLE_PROPERTY_COMPARATORS;
@@ -107,6 +107,11 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
           return HomePieceOfFurniture.compare(piece1.depth, piece2.depth);
         }
       });
+    SORTABLE_PROPERTY_COMPARATORS.put(SortableProperty.VOLUME, new Comparator<HomePieceOfFurniture>() {
+      public int compare(HomePieceOfFurniture piece1, HomePieceOfFurniture piece2) {
+        return HomePieceOfFurniture.compare(piece1.getVolume(), piece2.getVolume());
+      }
+    });
     SORTABLE_PROPERTY_COMPARATORS.put(SortableProperty.MOVABLE, new Comparator<HomePieceOfFurniture>() {
         public int compare(HomePieceOfFurniture piece1, HomePieceOfFurniture piece2) {
           return HomePieceOfFurniture.compare(piece1.movable, piece2.movable);
@@ -244,6 +249,7 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
   private float                  width;
   private float                  depth;
   private float                  height;
+  private float                  volume;
   private float                  elevation;
   private float                  dropOnTopElevation;
   private boolean                movable;
@@ -286,6 +292,7 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
     this.width = piece.getWidth();
     this.depth = piece.getDepth();
     this.height = piece.getHeight();
+    this.volume = piece.getVolume();
     this.elevation = piece.getElevation();
     this.dropOnTopElevation = piece.getDropOnTopElevation();
     this.movable = piece.isMovable();
@@ -378,8 +385,7 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
    * listeners added to this piece will receive a change notification.
    */
   public void setName(String name) {
-    if (name != this.name
-        && (name == null || !name.equals(this.name))) {
+    if (name == null || !name.equals(this.name)) {
       String oldName = this.name;
       this.name = name;
       this.propertyChangeSupport.firePropertyChange(Property.NAME.name(), oldName, name);
@@ -498,8 +504,7 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
    * listeners added to this piece will receive a change notification.
    */
   public void setDescription(String description) {
-    if (description != this.description
-        && (description == null || !description.equals(this.description))) {
+    if (description == null || !description.equals(this.description)) {
       String oldDescription = this.description;
       this.description = description;
       this.propertyChangeSupport.firePropertyChange(Property.DESCRIPTION.name(), oldDescription, description);
@@ -582,6 +587,22 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
         this.width = width;
         this.shapeCache = null;
         this.propertyChangeSupport.firePropertyChange(Property.WIDTH.name(), oldWidth, width);
+      }
+    } else {
+      throw new IllegalStateException("Piece isn't resizable");
+    }
+  }
+
+  public float getVolume() {
+    return getHeight()*getWidth()*getDepth();
+  }
+
+  public void setVolume(float volume) {
+    if (isResizable()) {
+      if (volume != this.volume) {
+        float oldVolume = this.volume;
+        this.volume = volume;
+        this.propertyChangeSupport.firePropertyChange(Property.VOLUME.name(), oldVolume, volume);
       }
     } else {
       throw new IllegalStateException("Piece isn't resizable");
