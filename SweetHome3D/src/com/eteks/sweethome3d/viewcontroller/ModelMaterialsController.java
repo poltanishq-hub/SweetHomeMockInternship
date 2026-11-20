@@ -124,7 +124,7 @@ public class ModelMaterialsController implements Controller {
   /**
    * Sets the size of the 3D model used to preview materials change.
    */
-  void setModelSize(float width, float depth, float height) {
+  void setModelSize(float width, float depth, float height, float volume) {
     this.modelWidth = width;
     this.modelDepth = depth;
     this.modelHeight = height;
